@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+import 'app/collections/category.dart';
+import 'app/collections/routine.dart';
+
+void main() async {
+  final dir = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    schemas: [RoutineSchema, CategorySchema],
+    directory: dir.path,
+  );
   runApp(const MyApp());
 }
 
@@ -10,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Isar CRUD',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

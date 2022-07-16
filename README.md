@@ -8,8 +8,37 @@
 
 <img align="right" src="screenshots/store_icons/playstore.png" height="190"></img>
 
-A new Flutter project.
+Isar is a No-SQL relational database for Flutter a application. I am using an [YouTube](https://www.youtube.com/watch?v=j3UeWbIfXL4&list=PLKKf8l1ne4_hMBtRykh9GCC4MMyteUTyf&index=1) tutorial for this project. In this tutorial we will learn the following topics:
 
-## Getting Started
+```dart
+    1. Collections
+    2. Indexes
+    3. CRUD
+    4. Queries
+    5. Full-text search
+    6. Transactions
+    7. Watches
+    8. Schema & Collection
+```
 
+## pubspec.yaml
 
+```yaml
+dependencies:
+  isar: ^2.5.0
+  isar_flutter_libs: ^2.5.0 # contains the binaries (not required for web)
+
+dev_dependencies:
+  isar_generator: ^2.5.0
+  build_runner: ^2.2.0
+```
+
+Command to execute build runner:
+
+```shell
+ $ flutter pub run build_runner build
+```
+
+## Isar Inspector
+
+<p align="center"><img src="screenshots/isar-inspector.png"></p>
