@@ -26,7 +26,10 @@ Isar is a No-SQL relational database for Flutter a application. I am using an [Y
 ```yaml
 dependencies:
   isar: ^2.5.0
-  isar_flutter_libs: ^2.5.0 # contains the binaries (not required for web)
+  # contains the binaries (not required for web)
+  isar_flutter_libs: ^2.5.0
+  # For providing the storage path
+  path_provider: ^2.0.11
 
 dev_dependencies:
   isar_generator: ^2.5.0
