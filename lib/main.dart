@@ -13,11 +13,15 @@ void main() async {
     schemas: [RoutineSchema, CategorySchema],
     directory: dir.path,
   );
-  runApp(const MyApp());
+  runApp(MyApp(isar: isar));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final Isar isar;
+  const MyApp({
+    Key? key,
+    required this.isar,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +29,7 @@ class MyApp extends StatelessWidget {
       title: 'Routine App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomePage(),
+      home: HomePage(isar: isar),
     );
   }
 }

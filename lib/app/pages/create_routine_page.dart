@@ -1,9 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
+
+import '/app/collections/category.dart';
 
 class CreateRoutinePage extends StatefulWidget {
-  const CreateRoutinePage({Key? key}) : super(key: key);
+  final Isar isar;
+  const CreateRoutinePage({
+    Key? key,
+    required this.isar,
+  }) : super(key: key);
 
   @override
   State<CreateRoutinePage> createState() => _CreateRoutinePageState();
@@ -76,13 +81,13 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
                         context: context,
                         builder: (BuildContext context) => AlertDialog(
                           title: const Text('New Category'),
-                          content: TextFormField(
-                            controller: _newCatController,
-                          ),
+                          content: TextFormField(controller: _newCatController),
                           actions: [
                             ElevatedButton(
                               onPressed: () {
-                                Navigator.pop(context);
+                                if (_newCatController.text.isNotEmpty) {
+                                  _addCategory(widget.isar);
+                                }
                               },
                               child: const Text('Add'),
                             ),
@@ -155,21 +160,30 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
   }
 
   _selectedTime(BuildContext context) async {
-    try {
-      final TimeOfDay? timeOfDay = await showTimePicker(
-        context: context,
-        initialTime: selectedTime,
-        initialEntryMode: TimePickerEntryMode.dial,
-      );
-      if (timeOfDay != null && timeOfDay != selectedTime) {
-        selectedTime = timeOfDay;
-        setState(() {
-          _timeController.text =
-              '${selectedTime.hour}:${selectedTime.minute} ${selectedTime.period.name}';
-        });
-      }
-    } catch (e) {
-      log(e.toString());
+    final TimeOfDay? timeOfDay = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
+      initialEntryMode: TimePickerEntryMode.dial,
+    );
+    if (timeOfDay != null && timeOfDay != selectedTime) {
+      selectedTime = timeOfDay;
+      setState(() {
+        _timeController.text =
+            '${selectedTime.hour}:${selectedTime.minute} ${selectedTime.period.name}';
+      });
     }
+  }
+
+  // create category record
+  _addCategory(Isar isar) async {
+    final catagories = isar.categorys;
+
+    final newCategory = Category()..name = _newCatController.text;
+
+    await isar.writeTxn((isar) async {
+      await catagories.put(newCategory);
+    });
+
+    _newCatController.clear();
   }
 }

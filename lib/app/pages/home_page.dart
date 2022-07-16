@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:isar_crud/app/pages/create_routine_page.dart';
+import 'package:isar/isar.dart';
+
+import 'create_routine_page.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final Isar isar;
+  const HomePage({
+    Key? key,
+    required this.isar,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +23,7 @@ class HomePage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const CreateRoutinePage(),
+                  builder: (context) => CreateRoutinePage(isar: isar),
                 ),
               );
             },
