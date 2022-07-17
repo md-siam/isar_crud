@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
 import '/app/collections/category.dart';
+import '/app/collections/routine.dart';
 
 class CreateRoutinePage extends StatefulWidget {
   final Isar isar;
@@ -15,8 +16,8 @@ class CreateRoutinePage extends StatefulWidget {
 }
 
 class _CreateRoutinePageState extends State<CreateRoutinePage> {
-  List<String> categories = ['work', 'school', 'home'];
-  String dropdownValue = 'work';
+  List<Category>? categories;
+  Category? dropdownValue;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _newCatController = TextEditingController();
@@ -35,6 +36,12 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
     fontSize: 18,
     fontWeight: FontWeight.bold,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    _readCategory();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,11 +71,11 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
                       icon: const Icon(Icons.keyboard_arrow_down),
                       value: dropdownValue,
                       items: categories
-                          .map<DropdownMenuItem<String>>((String newValue) =>
-                              DropdownMenuItem<String>(
-                                  value: newValue, child: Text(newValue)))
+                          ?.map<DropdownMenuItem<Category>>(
+                              (Category newValue) => DropdownMenuItem<Category>(
+                                  value: newValue, child: Text(newValue.name)))
                           .toList(),
-                      onChanged: (String? newValue) {
+                      onChanged: (Category? newValue) {
                         setState(() {
                           dropdownValue = newValue!;
                         });
@@ -87,6 +94,7 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
                               onPressed: () {
                                 if (_newCatController.text.isNotEmpty) {
                                   _addCategory(widget.isar);
+                                  Navigator.pop(context);
                                 }
                               },
                               child: const Text('Add'),
@@ -148,7 +156,9 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    addRoutine();
+                  },
                   child: const Text('Add'),
                 ),
               ),
@@ -185,5 +195,43 @@ class _CreateRoutinePageState extends State<CreateRoutinePage> {
     });
 
     _newCatController.clear();
+    _readCategory();
+  }
+
+  _readCategory() async {
+    final categoryCollection = widget.isar.categorys;
+    final getCategories = await categoryCollection.where().findAll();
+    setState(() {
+      dropdownValue = null;
+      categories = getCategories;
+    });
+  }
+
+  addRoutine() async {
+    final routineCollection = widget.isar.routines;
+    final newRoutine = Routine()
+      ..title = _titleController.text
+      ..startTimeRoutine = _timeController.text
+      ..day = dropdownDay
+      ..category.value = dropdownValue;
+
+    await widget.isar.writeTxn((isar) async {
+      await routineCollection.put(newRoutine);
+    });
+
+    _titleController.clear();
+    _timeController.clear();
+    dropdownDay = 'monday';
+    dropdownValue = null;
+
+    // SnackBar for notifying the user
+    final snackBar = SnackBar(
+      content: Text('${_titleController.text.toString()} added!'),
+      action: SnackBarAction(
+        label: 'ok',
+        onPressed: () => Navigator.pop(context),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

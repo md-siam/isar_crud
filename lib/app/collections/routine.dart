@@ -11,7 +11,7 @@ class Routine {
   late String title;
 
   @Index()
-  late DateTime startTime; // data will be recorded according to startTime
+  late String startTimeRoutine; // data will be recorded according to startTime
 
   @Index(caseSensitive: false)
   late String day;

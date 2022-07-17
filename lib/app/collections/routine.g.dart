@@ -15,17 +15,17 @@ extension GetRoutineCollection on Isar {
 const RoutineSchema = CollectionSchema(
   name: 'Routine',
   schema:
-      '{"name":"Routine","idName":"id","properties":[{"name":"day","type":"String"},{"name":"startTime","type":"Long"},{"name":"title","type":"String"}],"indexes":[{"name":"day","unique":false,"properties":[{"name":"day","type":"Hash","caseSensitive":false}]},{"name":"startTime","unique":false,"properties":[{"name":"startTime","type":"Value","caseSensitive":false}]}],"links":[{"name":"category","target":"Category"}]}',
+      '{"name":"Routine","idName":"id","properties":[{"name":"day","type":"String"},{"name":"startTimeRoutine","type":"String"},{"name":"title","type":"String"}],"indexes":[{"name":"day","unique":false,"properties":[{"name":"day","type":"Hash","caseSensitive":false}]},{"name":"startTimeRoutine","unique":false,"properties":[{"name":"startTimeRoutine","type":"Hash","caseSensitive":true}]}],"links":[{"name":"category","target":"Category"}]}',
   idName: 'id',
-  propertyIds: {'day': 0, 'startTime': 1, 'title': 2},
+  propertyIds: {'day': 0, 'startTimeRoutine': 1, 'title': 2},
   listProperties: {},
-  indexIds: {'day': 0, 'startTime': 1},
+  indexIds: {'day': 0, 'startTimeRoutine': 1},
   indexValueTypes: {
     'day': [
       IndexValueType.stringHashCIS,
     ],
-    'startTime': [
-      IndexValueType.long,
+    'startTimeRoutine': [
+      IndexValueType.stringHash,
     ]
   },
   linkIds: {'category': 0},
@@ -70,8 +70,9 @@ void _routineSerializeNative(
   final value0 = object.day;
   final _day = IsarBinaryWriter.utf8Encoder.convert(value0);
   dynamicSize += (_day.length) as int;
-  final value1 = object.startTime;
-  final _startTime = value1;
+  final value1 = object.startTimeRoutine;
+  final _startTimeRoutine = IsarBinaryWriter.utf8Encoder.convert(value1);
+  dynamicSize += (_startTimeRoutine.length) as int;
   final value2 = object.title;
   final _title = IsarBinaryWriter.utf8Encoder.convert(value2);
   dynamicSize += (_title.length) as int;
@@ -82,7 +83,7 @@ void _routineSerializeNative(
   final buffer = IsarNative.bufAsBytes(rawObj.buffer, size);
   final writer = IsarBinaryWriter(buffer, staticSize);
   writer.writeBytes(offsets[0], _day);
-  writer.writeDateTime(offsets[1], _startTime);
+  writer.writeBytes(offsets[1], _startTimeRoutine);
   writer.writeBytes(offsets[2], _title);
 }
 
@@ -91,7 +92,7 @@ Routine _routineDeserializeNative(IsarCollection<Routine> collection, int id,
   final object = Routine();
   object.day = reader.readString(offsets[0]);
   object.id = id;
-  object.startTime = reader.readDateTime(offsets[1]);
+  object.startTimeRoutine = reader.readString(offsets[1]);
   object.title = reader.readString(offsets[2]);
   _routineAttachLinks(collection, id, object);
   return object;
@@ -105,7 +106,7 @@ P _routineDeserializePropNative<P>(
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
     default:
@@ -118,8 +119,7 @@ dynamic _routineSerializeWeb(
   final jsObj = IsarNative.newJsObject();
   IsarNative.jsObjectSet(jsObj, 'day', object.day);
   IsarNative.jsObjectSet(jsObj, 'id', object.id);
-  IsarNative.jsObjectSet(
-      jsObj, 'startTime', object.startTime.toUtc().millisecondsSinceEpoch);
+  IsarNative.jsObjectSet(jsObj, 'startTimeRoutine', object.startTimeRoutine);
   IsarNative.jsObjectSet(jsObj, 'title', object.title);
   return jsObj;
 }
@@ -129,12 +129,8 @@ Routine _routineDeserializeWeb(
   final object = Routine();
   object.day = IsarNative.jsObjectGet(jsObj, 'day') ?? '';
   object.id = IsarNative.jsObjectGet(jsObj, 'id') ?? double.negativeInfinity;
-  object.startTime = IsarNative.jsObjectGet(jsObj, 'startTime') != null
-      ? DateTime.fromMillisecondsSinceEpoch(
-              IsarNative.jsObjectGet(jsObj, 'startTime'),
-              isUtc: true)
-          .toLocal()
-      : DateTime.fromMillisecondsSinceEpoch(0);
+  object.startTimeRoutine =
+      IsarNative.jsObjectGet(jsObj, 'startTimeRoutine') ?? '';
   object.title = IsarNative.jsObjectGet(jsObj, 'title') ?? '';
   _routineAttachLinks(collection,
       IsarNative.jsObjectGet(jsObj, 'id') ?? double.negativeInfinity, object);
@@ -148,13 +144,8 @@ P _routineDeserializePropWeb<P>(Object jsObj, String propertyName) {
     case 'id':
       return (IsarNative.jsObjectGet(jsObj, 'id') ?? double.negativeInfinity)
           as P;
-    case 'startTime':
-      return (IsarNative.jsObjectGet(jsObj, 'startTime') != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-                  IsarNative.jsObjectGet(jsObj, 'startTime'),
-                  isUtc: true)
-              .toLocal()
-          : DateTime.fromMillisecondsSinceEpoch(0)) as P;
+    case 'startTimeRoutine':
+      return (IsarNative.jsObjectGet(jsObj, 'startTimeRoutine') ?? '') as P;
     case 'title':
       return (IsarNative.jsObjectGet(jsObj, 'title') ?? '') as P;
     default:
@@ -175,9 +166,9 @@ extension RoutineQueryWhereSort on QueryBuilder<Routine, Routine, QWhere> {
     return addWhereClauseInternal(const IndexWhereClause.any(indexName: 'day'));
   }
 
-  QueryBuilder<Routine, Routine, QAfterWhere> anyStartTime() {
+  QueryBuilder<Routine, Routine, QAfterWhere> anyStartTimeRoutine() {
     return addWhereClauseInternal(
-        const IndexWhereClause.any(indexName: 'startTime'));
+        const IndexWhereClause.any(indexName: 'startTimeRoutine'));
   }
 }
 
@@ -266,74 +257,37 @@ extension RoutineQueryWhere on QueryBuilder<Routine, Routine, QWhereClause> {
     }
   }
 
-  QueryBuilder<Routine, Routine, QAfterWhereClause> startTimeEqualTo(
-      DateTime startTime) {
+  QueryBuilder<Routine, Routine, QAfterWhereClause> startTimeRoutineEqualTo(
+      String startTimeRoutine) {
     return addWhereClauseInternal(IndexWhereClause.equalTo(
-      indexName: 'startTime',
-      value: [startTime],
+      indexName: 'startTimeRoutine',
+      value: [startTimeRoutine],
     ));
   }
 
-  QueryBuilder<Routine, Routine, QAfterWhereClause> startTimeNotEqualTo(
-      DateTime startTime) {
+  QueryBuilder<Routine, Routine, QAfterWhereClause> startTimeRoutineNotEqualTo(
+      String startTimeRoutine) {
     if (whereSortInternal == Sort.asc) {
       return addWhereClauseInternal(IndexWhereClause.lessThan(
-        indexName: 'startTime',
-        upper: [startTime],
+        indexName: 'startTimeRoutine',
+        upper: [startTimeRoutine],
         includeUpper: false,
       )).addWhereClauseInternal(IndexWhereClause.greaterThan(
-        indexName: 'startTime',
-        lower: [startTime],
+        indexName: 'startTimeRoutine',
+        lower: [startTimeRoutine],
         includeLower: false,
       ));
     } else {
       return addWhereClauseInternal(IndexWhereClause.greaterThan(
-        indexName: 'startTime',
-        lower: [startTime],
+        indexName: 'startTimeRoutine',
+        lower: [startTimeRoutine],
         includeLower: false,
       )).addWhereClauseInternal(IndexWhereClause.lessThan(
-        indexName: 'startTime',
-        upper: [startTime],
+        indexName: 'startTimeRoutine',
+        upper: [startTimeRoutine],
         includeUpper: false,
       ));
     }
-  }
-
-  QueryBuilder<Routine, Routine, QAfterWhereClause> startTimeGreaterThan(
-    DateTime startTime, {
-    bool include = false,
-  }) {
-    return addWhereClauseInternal(IndexWhereClause.greaterThan(
-      indexName: 'startTime',
-      lower: [startTime],
-      includeLower: include,
-    ));
-  }
-
-  QueryBuilder<Routine, Routine, QAfterWhereClause> startTimeLessThan(
-    DateTime startTime, {
-    bool include = false,
-  }) {
-    return addWhereClauseInternal(IndexWhereClause.lessThan(
-      indexName: 'startTime',
-      upper: [startTime],
-      includeUpper: include,
-    ));
-  }
-
-  QueryBuilder<Routine, Routine, QAfterWhereClause> startTimeBetween(
-    DateTime lowerStartTime,
-    DateTime upperStartTime, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return addWhereClauseInternal(IndexWhereClause.between(
-      indexName: 'startTime',
-      lower: [lowerStartTime],
-      includeLower: includeLower,
-      upper: [upperStartTime],
-      includeUpper: includeUpper,
-    ));
   }
 }
 
@@ -489,51 +443,109 @@ extension RoutineQueryFilter
     ));
   }
 
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> startTimeEqualTo(
-      DateTime value) {
+  QueryBuilder<Routine, Routine, QAfterFilterCondition> startTimeRoutineEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.eq,
-      property: 'startTime',
+      property: 'startTimeRoutine',
       value: value,
+      caseSensitive: caseSensitive,
     ));
   }
 
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> startTimeGreaterThan(
-    DateTime value, {
+  QueryBuilder<Routine, Routine, QAfterFilterCondition>
+      startTimeRoutineGreaterThan(
+    String value, {
+    bool caseSensitive = true,
     bool include = false,
   }) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.gt,
       include: include,
-      property: 'startTime',
+      property: 'startTimeRoutine',
       value: value,
+      caseSensitive: caseSensitive,
     ));
   }
 
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> startTimeLessThan(
-    DateTime value, {
+  QueryBuilder<Routine, Routine, QAfterFilterCondition>
+      startTimeRoutineLessThan(
+    String value, {
+    bool caseSensitive = true,
     bool include = false,
   }) {
     return addFilterConditionInternal(FilterCondition(
       type: ConditionType.lt,
       include: include,
-      property: 'startTime',
+      property: 'startTimeRoutine',
       value: value,
+      caseSensitive: caseSensitive,
     ));
   }
 
-  QueryBuilder<Routine, Routine, QAfterFilterCondition> startTimeBetween(
-    DateTime lower,
-    DateTime upper, {
+  QueryBuilder<Routine, Routine, QAfterFilterCondition> startTimeRoutineBetween(
+    String lower,
+    String upper, {
+    bool caseSensitive = true,
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return addFilterConditionInternal(FilterCondition.between(
-      property: 'startTime',
+      property: 'startTimeRoutine',
       lower: lower,
       includeLower: includeLower,
       upper: upper,
       includeUpper: includeUpper,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<Routine, Routine, QAfterFilterCondition>
+      startTimeRoutineStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.startsWith,
+      property: 'startTimeRoutine',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<Routine, Routine, QAfterFilterCondition>
+      startTimeRoutineEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.endsWith,
+      property: 'startTimeRoutine',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<Routine, Routine, QAfterFilterCondition>
+      startTimeRoutineContains(String value, {bool caseSensitive = true}) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.contains,
+      property: 'startTimeRoutine',
+      value: value,
+      caseSensitive: caseSensitive,
+    ));
+  }
+
+  QueryBuilder<Routine, Routine, QAfterFilterCondition> startTimeRoutineMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return addFilterConditionInternal(FilterCondition(
+      type: ConditionType.matches,
+      property: 'startTimeRoutine',
+      value: pattern,
+      caseSensitive: caseSensitive,
     ));
   }
 
@@ -670,12 +682,12 @@ extension RoutineQueryWhereSortBy on QueryBuilder<Routine, Routine, QSortBy> {
     return addSortByInternal('id', Sort.desc);
   }
 
-  QueryBuilder<Routine, Routine, QAfterSortBy> sortByStartTime() {
-    return addSortByInternal('startTime', Sort.asc);
+  QueryBuilder<Routine, Routine, QAfterSortBy> sortByStartTimeRoutine() {
+    return addSortByInternal('startTimeRoutine', Sort.asc);
   }
 
-  QueryBuilder<Routine, Routine, QAfterSortBy> sortByStartTimeDesc() {
-    return addSortByInternal('startTime', Sort.desc);
+  QueryBuilder<Routine, Routine, QAfterSortBy> sortByStartTimeRoutineDesc() {
+    return addSortByInternal('startTimeRoutine', Sort.desc);
   }
 
   QueryBuilder<Routine, Routine, QAfterSortBy> sortByTitle() {
@@ -705,12 +717,12 @@ extension RoutineQueryWhereSortThenBy
     return addSortByInternal('id', Sort.desc);
   }
 
-  QueryBuilder<Routine, Routine, QAfterSortBy> thenByStartTime() {
-    return addSortByInternal('startTime', Sort.asc);
+  QueryBuilder<Routine, Routine, QAfterSortBy> thenByStartTimeRoutine() {
+    return addSortByInternal('startTimeRoutine', Sort.asc);
   }
 
-  QueryBuilder<Routine, Routine, QAfterSortBy> thenByStartTimeDesc() {
-    return addSortByInternal('startTime', Sort.desc);
+  QueryBuilder<Routine, Routine, QAfterSortBy> thenByStartTimeRoutineDesc() {
+    return addSortByInternal('startTimeRoutine', Sort.desc);
   }
 
   QueryBuilder<Routine, Routine, QAfterSortBy> thenByTitle() {
@@ -733,8 +745,10 @@ extension RoutineQueryWhereDistinct
     return addDistinctByInternal('id');
   }
 
-  QueryBuilder<Routine, Routine, QDistinct> distinctByStartTime() {
-    return addDistinctByInternal('startTime');
+  QueryBuilder<Routine, Routine, QDistinct> distinctByStartTimeRoutine(
+      {bool caseSensitive = true}) {
+    return addDistinctByInternal('startTimeRoutine',
+        caseSensitive: caseSensitive);
   }
 
   QueryBuilder<Routine, Routine, QDistinct> distinctByTitle(
@@ -753,8 +767,8 @@ extension RoutineQueryProperty
     return addPropertyNameInternal('id');
   }
 
-  QueryBuilder<Routine, DateTime, QQueryOperations> startTimeProperty() {
-    return addPropertyNameInternal('startTime');
+  QueryBuilder<Routine, String, QQueryOperations> startTimeRoutineProperty() {
+    return addPropertyNameInternal('startTimeRoutine');
   }
 
   QueryBuilder<Routine, String, QQueryOperations> titleProperty() {
