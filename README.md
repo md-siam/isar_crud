@@ -42,6 +42,53 @@ Command to execute build runner:
  $ flutter pub run build_runner build
 ```
 
-## Isar Inspector
+## Isar CRUD
 
-<p align="center"><img src="screenshots/isar-inspector.png"></p>
+Create: [create_routine_page.dart](lib/app/pages/create_routine_page.dart)
+
+```dart
+  addRoutine() async {
+    final routineCollection = widget.isar.routines;
+    final newRoutine = Routine()
+      ..title = _titleController.text
+      ..startTimeRoutine = _timeController.text
+      ..day = dropdownDay
+      ..category.value = dropdownValue;
+
+    await widget.isar.writeTxn((isar) async {
+      await routineCollection.put(newRoutine);
+    });
+
+    _titleController.clear();
+    _timeController.clear();
+    dropdownDay = 'monday';
+    dropdownValue = null;
+
+    // SnackBar for notifying the user
+    final snackBar = SnackBar(
+      content: Text('${_titleController.text.toString()} added!'),
+      action: SnackBarAction(
+        label: 'ok',
+        onPressed: () => Navigator.pop(context),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+```
+
+Read: [home_page.dart](lib/app/pages/home_page.dart)
+
+```dart
+  _readRoutines() async {
+    final routineCollection = widget.isar.routines;
+    final getRoutines = await routineCollection.where().findAll();
+
+    setState(() {
+      routines = getRoutines;
+      isLoading = false;
+    });
+    // print(routines![0].title);
+    // print(routines![0].startTimeRoutine);
+    // print(routines!.length);
+  }
+```
