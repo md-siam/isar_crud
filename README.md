@@ -92,3 +92,24 @@ Read: [home_page.dart](lib/app/pages/home_page.dart)
     // print(routines!.length);
   }
 ```
+
+Update: [update_routine_page.dart](lib/app/pages/update_routine_page.dart)
+
+```dart
+  updateRoutine() async {
+    final routineCollection = widget.isar.routines;
+    await widget.isar.writeTxn((isar) async {
+      final routine = await routineCollection.get(widget.routine.id);
+
+      routine!
+        ..title = _titleController.text
+        ..startTimeRoutine = _timeController.text
+        ..day = dropdownDay
+        ..category.value = dropdownValue;
+
+      await routineCollection.put(routine);
+
+      Navigator.pop(context);
+    });
+  }
+```

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
-import 'create_routine_page.dart';
 import '/app/collections/routine.dart';
+import 'create_routine_page.dart';
+import 'update_routine_page.dart';
 
 class HomePage extends StatefulWidget {
   final Isar isar;
@@ -50,14 +51,26 @@ class _HomePageState extends State<HomePage> {
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               controller: null,
-              child: Column(
-                children: _buildWidgets(),
+              child: FutureBuilder<List<Widget>>(
+                future: _buildWidgets(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: snapshot.data!,
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                },
               ),
             ),
     );
   }
 
-  List<Widget> _buildWidgets() {
+  Future<List<Widget>> _buildWidgets() async {
+    // this will load the data again
+    await _readRoutines();
+
     List<Widget> x = [];
 
     for (int i = 0; i < routines!.length; i++) {
@@ -65,6 +78,17 @@ class _HomePageState extends State<HomePage> {
         Card(
           elevation: 4.0,
           child: ListTile(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => UpdateRoutinePage(
+                    isar: widget.isar,
+                    routine: routines![i],
+                  ),
+                ),
+              );
+            },
             title: Padding(
               padding: const EdgeInsets.only(top: 5.0, bottom: 2.0),
               child: Column(
