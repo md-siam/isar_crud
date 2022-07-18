@@ -145,3 +145,20 @@ Update: [update_routine_page.dart](lib/app/pages/update_routine_page.dart)
     });
   } 
 ```
+
+## Handling Transaction
+A transaction is a set of operations, or a set of  statements that are executed as a unit together. In short, it will involve more than one operation.
+
+```dart
+  clearAll() async {
+    final routineCollection = widget.isar.routines;
+    final getRoutines = await routineCollection.where().findAll();
+
+    await widget.isar.writeTxn((isar) async {
+      for (var routine in getRoutines) {
+        routineCollection.delete(routine.id);
+      }
+    });
+    setState(() {});
+  }
+```
