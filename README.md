@@ -4,7 +4,7 @@
 <img src="screenshots/badges/Flutter-3.svg" height="28px" />&nbsp;&nbsp;
 <img src="screenshots/badges/dart-null_safety-blue.svg" height="28px"/>
 
-# Isar CRUD
+# Isar CRUD - [YouTube](https://www.youtube.com/watch?v=j3UeWbIfXL4&list=PLKKf8l1ne4_hMBtRykh9GCC4MMyteUTyf&index=1) 
 
 <img align="right" src="screenshots/store_icons/playstore.png" height="190"></img>
 
@@ -129,4 +129,19 @@ Update: [update_routine_page.dart](lib/app/pages/update_routine_page.dart)
       MaterialPageRoute(builder: (context) => HomePage(isar: widget.isar)),
     );
   }
+```
+
+## Searching
+```dart
+  searchRoutineByName(String searchName) async {
+    searching = true;
+    final routineCollection = widget.isar.routines;
+    final searchResults =
+        await routineCollection.filter().titleContains(searchName).findAll();
+
+    setState(() {
+      routines = searchResults;
+      isLoading = false;
+    });
+  } 
 ```

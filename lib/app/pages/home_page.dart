@@ -19,6 +19,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Routine>? routines;
   bool isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
+  bool searching = false;
 
   @override
   void initState() {
@@ -51,17 +53,39 @@ class _HomePageState extends State<HomePage> {
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               controller: null,
-              child: FutureBuilder<List<Widget>>(
-                future: _buildWidgets(),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: snapshot.data!,
-                    );
-                  } else {
-                    return const SizedBox();
-                  }
-                },
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      onChanged: searchRoutineByName,
+                      controller: _searchController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(style: BorderStyle.solid),
+                        ),
+                        hintText: 'Search routine..',
+                        hintStyle: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  ),
+                  const Divider(
+                    thickness: 1,
+                  ),
+                  const SizedBox(height: 5.0),
+                  FutureBuilder<List<Widget>>(
+                    future: _buildWidgets(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        return Column(
+                          children: snapshot.data!,
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
     );
@@ -69,7 +93,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<Widget>> _buildWidgets() async {
     // this will load the data again
-    await _readRoutines();
+    if (!searching) {
+      await _readRoutines();
+    }
 
     List<Widget> x = [];
 
@@ -156,5 +182,17 @@ class _HomePageState extends State<HomePage> {
     // print(routines![0].title);
     // print(routines![0].startTimeRoutine);
     // print(routines!.length);
+  }
+
+  searchRoutineByName(String searchName) async {
+    searching = true;
+    final routineCollection = widget.isar.routines;
+    final searchResults =
+        await routineCollection.filter().titleContains(searchName).findAll();
+
+    setState(() {
+      routines = searchResults;
+      isLoading = false;
+    });
   }
 }
