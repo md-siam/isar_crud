@@ -113,3 +113,20 @@ Update: [update_routine_page.dart](lib/app/pages/update_routine_page.dart)
     });
   }
 ```
+
+Update: [update_routine_page.dart](lib/app/pages/update_routine_page.dart)
+
+```dart
+  deleteRoutine() async {
+    final routineCollection = widget.isar.routines;
+
+    await widget.isar.writeTxn((isar) async {
+      routineCollection.delete(widget.routine.id);
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage(isar: widget.isar)),
+    );
+  }
+```

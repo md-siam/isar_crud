@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
+import 'package:isar_crud/app/pages/home_page.dart';
 
 import '/app/collections/category.dart';
 import '/app/collections/routine.dart';
@@ -51,6 +52,35 @@ class _UpdateRoutinePageState extends State<UpdateRoutinePage> {
       appBar: AppBar(
         title: const Text('Update Routine'),
         centerTitle: false,
+        actions: [
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Delete Routine'),
+                  content: const Text(
+                      'Are you sure you want to delete this routine?'),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {
+                        deleteRoutine();
+                      },
+                      child: const Text('Yes'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('No'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            icon: const Icon(Icons.delete_forever),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         controller: null,
@@ -238,5 +268,18 @@ class _UpdateRoutinePageState extends State<UpdateRoutinePage> {
 
       Navigator.pop(context);
     });
+  }
+
+  deleteRoutine() async {
+    final routineCollection = widget.isar.routines;
+
+    await widget.isar.writeTxn((isar) async {
+      routineCollection.delete(widget.routine.id);
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage(isar: widget.isar)),
+    );
   }
 }
