@@ -42,6 +42,10 @@ Command to execute build runner:
  $ flutter pub run build_runner build
 ```
 
+## App Demo
+
+<p align="center"><img src="screenshots/gif/demo.gif"></p>
+
 ## Isar CRUD
 
 Create: [create_routine_page.dart](lib/app/pages/create_routine_page.dart)
@@ -161,4 +165,21 @@ A transaction is a set of operations, or a set of  statements that are executed 
     });
     setState(() {});
   }
+```
+
+## File Pattern Inside The `lib` Folder
+
+```
+lib/
+├── app/
+│   ├── collections/
+│   │   ├── category.dart
+│   │   ├── category.g.dart
+│   │   ├── routine.dart
+│   │   └── routine.g.dart
+│   └── pages/
+│       ├── create_routine_page.dart
+│       ├── home_page.dart
+│       └── update_routine_page.dart
+└── main.dart
 ```
