@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
-import 'package:isar_crud/app/pages/home_page.dart';
+import 'home_page.dart';
 
 import '/app/collections/category.dart';
 import '/app/collections/routine.dart';
