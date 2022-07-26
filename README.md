@@ -118,7 +118,7 @@ Update: [update_routine_page.dart](lib/app/pages/update_routine_page.dart)
   }
 ```
 
-Update: [update_routine_page.dart](lib/app/pages/update_routine_page.dart)
+Delete: [update_routine_page.dart](lib/app/pages/update_routine_page.dart)
 
 ```dart
   deleteRoutine() async {
